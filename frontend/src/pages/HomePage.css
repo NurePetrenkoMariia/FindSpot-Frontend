@@ -1,0 +1,38 @@
+.container {
+    position: relative;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('../assets/camels.png');
+    background-size: cover;
+    background-position: center;
+    height: 91vh;
+    display: flex;
+  flex-direction: column; 
+  justify-content: center;
+  align-items: center;
+}
+
+.container_p-moto {
+  color: white;
+  font-size: 50px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.container_search-block {
+    display: flex;
+    align-items: center; 
+    gap: 10px;
+}
+
+.container_search-block .input-field{
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: none;
+  width: 385px;
+}
+
+.container_search-block .search-button{
+  border-radius: 20px;
+  padding: 5px 10px;
+  border: none;
+  background-color: rgb(243, 118, 23);
+}
