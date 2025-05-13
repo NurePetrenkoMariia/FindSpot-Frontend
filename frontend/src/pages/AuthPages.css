@@ -1,0 +1,44 @@
+.auth-form-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+}
+
+.auth-form-container form input{
+    margin-bottom: 15px; 
+    padding: 10px;
+    width: 100%;
+}
+
+.auth-form-container button{
+    width: 127px;
+    height: 45px;
+    background: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
+    border: none;
+}
+
+.auth-form-container-button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-link a{
+    color:rgb(0, 0, 0);
+}
+
+.auth-form-container h2{
+    padding: 17px;
+}
+
+.login-link{
+    padding: 10px;
+}

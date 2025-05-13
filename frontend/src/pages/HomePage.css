@@ -1,10 +1,11 @@
 .container {
-    position: relative;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('../assets/camels.png');
-    background-size: cover;
-    background-position: center;
-    height: 91vh;
-    display: flex;
+  flex-grow: 1;
+  height: 100%;
+  position: relative;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('../assets/camels.png');
+  background-size: cover;
+  background-position: center;
+  display: flex;
   flex-direction: column; 
   justify-content: center;
   align-items: center;
@@ -28,11 +29,25 @@
   border-radius: 20px;
   border: none;
   width: 385px;
+  height: 53px;
+  font-size: 16px; 
 }
 
 .container_search-block .search-button{
   border-radius: 20px;
   padding: 5px 10px;
   border: none;
-  background-color: rgb(243, 118, 23);
+  background-color: #EB662B;
+  height: 53px;
+  width: 100px;
+}
+
+.container_button-go-to-list{
+  border-radius: 20px;
+  padding: 7px 11px;
+  border: none;
+  background-color: #EB662B;
+  height: 53px;
+  margin: 15px;
+  align-self: center;
 }

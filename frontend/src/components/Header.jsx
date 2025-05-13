@@ -7,8 +7,8 @@ function Header() {
       <nav>
         <ul>
           <li><a href="/">Головна</a></li>
-          <li><a href="#">Зареєструватися</a></li>
-          <li className='header_login'><a href="#">Увійти</a></li>
+          <li><a href="/register">Зареєструватися</a></li>
+          <li className='header_login'><a href="/login">Увійти</a></li>
         </ul>
       </nav>
     </header>
