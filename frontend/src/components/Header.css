@@ -3,11 +3,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 5px 20px;
-  background-color: #f8f8f8;
+  background-color: #053B29;
 }
 
 .header h1 {
   margin: 0;
+  font-family: 'Cursive';
+  color: #ffffff;
 }
 
 .header ul {
@@ -24,11 +26,11 @@
 
 .header li a {
   text-decoration: none;
-  color: #333;
+  color: #ffffff;
 }
 
 .header_login {
-  background-color: black;
+  background-color: #E56E0C;
   border-radius: 20px;
 }
 
