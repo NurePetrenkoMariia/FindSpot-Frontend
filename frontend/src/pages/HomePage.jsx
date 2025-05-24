@@ -1,4 +1,5 @@
-import './HomePage.css'
+import './HomePage.css';
+import React from "react";
 
 function HomePage() {
 
@@ -10,7 +11,7 @@ function HomePage() {
           <input type="text" className='input-field' placeholder="Шукай туристичні місця" />
           <button className="search-button">Шукати</button>
         </div>
-        <button class="container_button-go-to-list">Перейти до публікацій</button>
+        <button className="container_button-go-to-list">Перейти до публікацій</button>
       </div>
     </>
   )

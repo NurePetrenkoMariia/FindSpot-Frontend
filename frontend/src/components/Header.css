@@ -21,7 +21,7 @@
 }
 
 .header ul li {
-  padding: 7px 12px ;
+  padding: 7px 12px;
 }
 
 .header li a {
@@ -36,4 +36,11 @@
 
 .header li.header_login a {
   color: white;
+}
+
+.header_logout {
+  background-color: #E56E0C;
+  border-radius: 20px;
+  color: #ffffff;
+  padding: 2px 12px;
 }
