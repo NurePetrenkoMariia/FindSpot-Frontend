@@ -6,6 +6,10 @@
     height: 70vh;
 }
 
+.register-container{
+    margin-top: 10px;
+}
+
 .auth-card {
     background-color: white;
     border: 2px solid #E56E0C;

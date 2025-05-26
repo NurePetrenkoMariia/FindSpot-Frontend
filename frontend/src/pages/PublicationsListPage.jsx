@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-//import axios from "axios";
+import axios from "axios";
 import './PublicationsListPage.css';
 
 function PublicationsListPage() {
@@ -7,37 +7,29 @@ function PublicationsListPage() {
     const [error, setError] = useState(null);
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [appliedCountries, setAppliedCountries] = useState([]);
+    const [publications, setPublications] = useState([]);
 
     const fakeCountries = ["Україна", "Англія", "Єгипет", "Ірландія", "Франція", "Італія"];
 
-    const fakePublications = [
-        {
-            id: 1,
-            title: "Title",
-            description: "Description",
-            imageUrl: "https://placehold.co/300x200",
-            location: "Париж, Франція",
-            country: "Франція",
-            averageRating: 4.8,
-            createdAt: "2025-05-20T12:00:00Z"
-        },
-        {
-            id: 2,
-            title: "Title",
-            description: "Description",
-            imageUrl: "https://placehold.co/300x200",
-            location: "Київ, Україна",
-            country: "Україна",
-            averageRating: 4.2,
-            createdAt: "2025-05-19T08:00:00Z"
-        },
+    useEffect(() => {
+        const fetchPublications = async () => {
 
-    ];
+            try {
+                const response = await axios.get("/api/BlogPosts"); 
+                setPublications(response.data);
+                setError(null);
+            } catch (err) {
+                setError("Помилка при завантаженні публікацій");
+            } 
+        };
+        fetchPublications();
+    }, []);
+
     const filteredPublications = appliedCountries.length === 0
-        ? fakePublications
-        : fakePublications.filter((pub) => appliedCountries.includes(pub.country));
+        ? publications
+        : publications.filter((pub) => appliedCountries.includes(pub.touristObject?.countryName || ""));
 
-     const handleCountryChange = (e) => {
+    const handleCountryChange = (e) => {
         const value = e.target.value;
         const checked = e.target.checked;
 
@@ -94,7 +86,7 @@ function PublicationsListPage() {
                         </select>
                     </div>
                     <div className="blogPost-container_buttons">
-                        <button className='blogPost-container_buttons_filter'  onClick={handleApplyFilters}>
+                        <button className='blogPost-container_buttons_filter' onClick={handleApplyFilters}>
                             Застосувати фільтри
                         </button>
                         <button className='blogPost-container_buttons_add' /*onClick={handleAdding}*/>
@@ -109,11 +101,11 @@ function PublicationsListPage() {
                         <div className='blogPost-container_list'>
                             {filteredPublications.map((post) => (
                                 <div key={post.id} className="blogPost-container_list_item">
-                                    <img src={post.imageUrl} alt="Фото" />
+                                    <img src={post.featuredImageUrl} alt="Фото" />
                                     <div className='blogPost-container_list_item_text'>
-                                        <strong>{post.title}</strong>
-                                        <p>{post.country}</p>
-                                        <p>{post.description}</p>
+                                        <strong>{post.pageTitle}</strong>
+                                        <p>{post.touristObject?.country || "Невідомо"}</p>
+                                        <p>{post.shortDescription}</p>
                                     </div>
                                     <button className="blogPost-container_list-details_button">Деталі публікації</button>
                                 </div>
@@ -126,4 +118,4 @@ function PublicationsListPage() {
     );
 }
 
-export default PublicationsListPage;
+export default PublicationsListPage; 
