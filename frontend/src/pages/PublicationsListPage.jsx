@@ -23,7 +23,6 @@ function PublicationsListPage() {
 
     useEffect(() => {
         const fetchPublications = async () => {
-
             try {
                 const response = await axios.get("/api/BlogPosts");
                 setPublications(response.data);
@@ -70,6 +69,10 @@ function PublicationsListPage() {
 
     const handleDetails = (postId) => {
         navigate(`/posts/${postId}`);
+    };
+
+    const handleAdding = () => {
+         navigate(`/posts/add`);
     }
     return (
         <>
@@ -124,7 +127,7 @@ function PublicationsListPage() {
                         <button className='blogPost-container_buttons_filter' onClick={handleApplyFilters}>
                             Застосувати фільтри
                         </button>
-                        <button className='blogPost-container_buttons_add' /*onClick={handleAdding}*/>
+                        <button className='blogPost-container_buttons_add' onClick={handleAdding}>
                             Створити новий пост
                         </button>
                     </div>

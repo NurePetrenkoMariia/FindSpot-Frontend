@@ -13,25 +13,31 @@ function LoginPage() {
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-        const response = await axios.post('/api/auth/login', {
-            email,
-            password
-        }, {
-            withCredentials: true
-        });
+        e.preventDefault();
+        try {
+            const response = await axios.post('/api/auth/login', {
+                email,
+                password
+            }, {
+                withCredentials: true
+            });
 
-        if (response.status === 200) {
-            setIsLoggedIn(true);
-            navigate('/');
-        } else {
-            setErrorMessage('Неправильний логін або пароль');
+            if (response.status === 200) {
+                setIsLoggedIn(true);
+                navigate('/');
+            }
+        } catch (error) {
+            if (error.response) {
+                if (error.response.status === 401) {
+                    setErrorMessage('Неправильний логін або пароль');
+                } else {
+                    setErrorMessage(`Помилка: ${error.response.status}`);
+                }
+            } else {
+                setErrorMessage("Помилка підключення до сервера");
+            }
         }
-    } catch (error) {
-        setErrorMessage("Помилка підключення до сервера");
-    }
-};
+    };
 
     return (
         <>

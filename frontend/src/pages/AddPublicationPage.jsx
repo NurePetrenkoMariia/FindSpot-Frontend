@@ -1,28 +1,33 @@
 import './AddPublicationPage.css';
 import React, { useState, useEffect } from "react";
-
-const fakeTouristObjects = [
-    { id: 1, name: "Ейфелева вежа" },
-    { id: 2, name: "Великий Британський музей" },
-    { id: 3, name: "Піраміди в Єгипті" },
-    { id: 4, name: "Тауерський міст" },
-    { id: 5, name: "Колізей" },
-    { id: 6, name: "Собор Святого Петра" },
-];
+import axios from 'axios';
 
 function AddPublicationPage() {
     const [title, setTitle] = useState("");
     const [imageUrl, setImageUrl] = useState("");
     const [description, setDescription] = useState("");
+    const [content, setContent] = useState("");
     const [tags, setTags] = useState("");
     const [touristObjects, setTouristObjects] = useState([]);
     const [selectedObjectId, setSelectedObjectId] = useState(null);
     const [searchText, setSearchText] = useState("");
     const [showSuggestions, setShowSuggestions] = useState(true);
     const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
 
     useEffect(() => {
-        setTouristObjects(fakeTouristObjects);
+        const fetchTouristObjects = async () => {
+            try {
+                const response = await axios.get('/api/BlogPosts/tourist-objects', {
+                    withCredentials: true
+                });
+                setTouristObjects(response.data);
+            } catch (error) {
+                setError("Не вдалося завантажити туристичні об'єкти");
+            }
+        };
+
+        fetchTouristObjects();
     }, []);
 
     const filteredObjects = touristObjects.filter(obj =>
@@ -30,11 +35,37 @@ function AddPublicationPage() {
     );
 
     const handleFileChange = async (e) => {
+        const file = e.target.files[0];
 
-    }
+        if (!file) {
+            return;
+        }
 
-    const handleSubmit = (e) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await axios.post('/api/Image', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                withCredentials: true
+            });
+
+            if (response.data.link) {
+                setImageUrl(response.data.link);
+            } else {
+                setError('Помилка при завантаженні зображення');
+            }
+        } catch (err) {
+            setError('Помилка при завантаженні зображення');
+        }
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setSuccessMessage('');
+        setError('');
 
         const exactMatch = touristObjects.find(
             (obj) => obj.name.toLowerCase() === searchText.trim().toLowerCase()
@@ -51,23 +82,34 @@ function AddPublicationPage() {
         }
 
         const newPublication = {
-            title,
-            imageUrl,
-            description,
-            tags: tags.split(",").map(t => t.trim()).filter(t => t.length > 0),
+            pageTitle: title,
+            shortDescription: description,
+            content: content,
+            featuredImageUrl: imageUrl,
+            publishedDate: new Date().toISOString(),
             touristObjectId: exactMatch.id,
+            tags: tags.split(",").map(t => ({ name: t.trim() })).filter(t => t.name.length > 0),
         };
 
-        // POST-запит 
-        console.log("Нова публікація:", newPublication);
+        try {
+            const response = await axios.post('/api/BlogPosts', newPublication, {
+                withCredentials: true
+            });
 
-        setTitle("");
-        setImageUrl("");
-        setDescription("");
-        setTags("");
-        setSelectedObjectId(null);
-        setSearchText("");
-        setError("");
+            if (response.status === 201) {
+                setSuccessMessage("Публікацію успішно додано!");
+                setTitle("");
+                setImageUrl("");
+                setDescription("");
+                setContent("");
+                setTags("");
+                setSelectedObjectId(null);
+                setSearchText("");
+            }
+        } catch (error) {
+            setError("Помилка при додаванні публікації");
+        }
+
     };
 
     return (
@@ -95,9 +137,16 @@ function AddPublicationPage() {
                                 type="file"
                                 accept="image/*"
                                 onChange={handleFileChange}
-                            //required
                             />
                         </label>
+                        {imageUrl && (
+                            <img
+                                src={imageUrl}
+                                alt="Превʼю"
+                                width="200"
+                                style={{ marginTop: '10px' }}
+                            />
+                        )}
                     </div>
 
                     <div className="add-publication_card-field">
@@ -111,6 +160,16 @@ function AddPublicationPage() {
                         </label>
                     </div>
 
+                    <div className="add-publication_card-field">
+                        <label>
+                            Текст*:
+                            <textarea
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                                required
+                            />
+                        </label>
+                    </div>
                     <div className="add-publication_card-field">
                         <label>
                             Теги (через кому):
@@ -182,6 +241,10 @@ function AddPublicationPage() {
                     {error}
                 </div>
             )}
+
+            {successMessage &&
+                <div className="form-success-message">{successMessage}</div>
+            }
 
         </div>
     );

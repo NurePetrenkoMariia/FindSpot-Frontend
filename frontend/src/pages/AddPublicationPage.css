@@ -99,7 +99,7 @@
     background-color: #f0f0f0;
 }
 
-.form-error-message {
+.form-error-message,.form-success-message {
     color: rgb(0, 0, 0);
     margin-bottom: 10px;
     font-size: 0.95rem;
