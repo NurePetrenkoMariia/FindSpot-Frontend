@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import './PublicationsListPage.css';
+import { useNavigate,useSearchParams } from "react-router-dom";
 
 function PublicationsListPage() {
 
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    const initialSearch = searchParams.get("search") || "";
+    const [searchQuery, setSearchQuery] = useState(initialSearch);
+    const [appliedSearchQuery, setAppliedSearchQuery] = useState(initialSearch);
+
     const [error, setError] = useState(null);
+
     const [selectedCountries, setSelectedCountries] = useState([]);
     const [appliedCountries, setAppliedCountries] = useState([]);
+
     const [publications, setPublications] = useState([]);
 
     const fakeCountries = ["Україна", "Англія", "Єгипет", "Ірландія", "Франція", "Італія"];
@@ -15,19 +25,31 @@ function PublicationsListPage() {
         const fetchPublications = async () => {
 
             try {
-                const response = await axios.get("/api/BlogPosts"); 
+                const response = await axios.get("/api/BlogPosts");
                 setPublications(response.data);
                 setError(null);
             } catch (err) {
                 setError("Помилка при завантаженні публікацій");
-            } 
+            }
         };
         fetchPublications();
     }, []);
 
-    const filteredPublications = appliedCountries.length === 0
-        ? publications
-        : publications.filter((pub) => appliedCountries.includes(pub.touristObject?.countryName || ""));
+    const filteredPublications = publications.filter((pub) => {
+        const countryMatch =
+            appliedCountries.length === 0 ||
+            appliedCountries.includes(pub.touristObject?.countryName || "");
+
+        const titleMatch = pub.pageTitle
+            .toLowerCase()
+            .includes(appliedSearchQuery.toLowerCase());
+
+        const tagsMatch = pub.tags?.some(tag =>
+            tag.name.toLowerCase().includes(appliedSearchQuery.toLowerCase())
+        );
+
+        return countryMatch && (titleMatch || tagsMatch);
+    });
 
     const handleCountryChange = (e) => {
         const value = e.target.value;
@@ -46,13 +68,26 @@ function PublicationsListPage() {
         setAppliedCountries(selectedCountries);
     };
 
+    const handleDetails = (postId) => {
+        navigate(`/posts/${postId}`);
+    }
     return (
         <>
             <div className='top-section'>
                 <h2 className="top-section-page-name">Cписок публікацій</h2>
                 <div className="top-section-search">
-                    <input type="text" className='top-section-search_input-field' placeholder="Пошук" />
-                    <button className="top-section-search_button">Шукати</button>
+                    <input
+                        type="text"
+                        className='top-section-search_input-field'
+                        placeholder="Пошук"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <button
+                        className="top-section-search_button"
+                        onClick={() => setAppliedSearchQuery(searchQuery)}>
+                        Шукати
+                    </button>
                 </div>
             </div>
             <div className='blogPosts-container'>
@@ -104,10 +139,15 @@ function PublicationsListPage() {
                                     <img src={post.featuredImageUrl} alt="Фото" />
                                     <div className='blogPost-container_list_item_text'>
                                         <strong>{post.pageTitle}</strong>
+                                        <div className="blogPost-container_list_item_tags">
+                                            {post.tags?.map((tag) => (
+                                                <span key={tag.id} className="tag">{tag.name}</span>
+                                            ))}
+                                        </div>
                                         <p>{post.touristObject?.country || "Невідомо"}</p>
                                         <p>{post.shortDescription}</p>
                                     </div>
-                                    <button className="blogPost-container_list-details_button">Деталі публікації</button>
+                                    <button className="blogPost-container_list-details_button" onClick={() => handleDetails(post.id)}>Деталі публікації</button>
                                 </div>
                             ))}
                         </div>

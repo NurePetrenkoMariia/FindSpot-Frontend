@@ -146,10 +146,15 @@
   flex: 1;
 }
 
+.blogPost-container_list_item_text p{
+margin-top: 5px;
+}
+
 .blogPost-container_list_item_text strong {
   display: block;
   font-size: 18px;
   margin-bottom: 8px;
+  margin-top: 13px;
 }
 
 .blogPost-container_list-details_button {
@@ -170,4 +175,14 @@
 .no-blogPosts {
   font-style: italic;
   color: #777;
+}
+
+.tag {
+  display: inline-block;
+  background-color: #e0e0e0;
+  color: #333;
+  padding: 4px 10px;
+  margin: 4px 4px 0 0;
+  border-radius: 20px;
+  font-size: 0.85rem;
 }
