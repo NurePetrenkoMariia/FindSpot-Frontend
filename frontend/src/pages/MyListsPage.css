@@ -1,0 +1,44 @@
+.my-lists-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.my-lists-page h2 {
+    font-size: 28px;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.list-section {
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 32px;
+}
+
+.list-section h3 {
+    font-size: 22px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.list-section p {
+    color: #777;
+    font-style: italic;
+}
+
+.list-section div {
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    background-color: #f8f9fa;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.list-section div:hover {
+    background-color: #e9ecef;
+}

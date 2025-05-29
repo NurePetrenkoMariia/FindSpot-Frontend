@@ -9,7 +9,7 @@ function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const { setIsLoggedIn } = useAuth();
+    const { setIsLoggedIn, setUser } = useAuth();
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
@@ -23,7 +23,9 @@ function LoginPage() {
             });
 
             if (response.status === 200) {
+                const { userId, userName, email, roles } = response.data;
                 setIsLoggedIn(true);
+                setUser({ userId, userName, email, roles });
                 navigate('/');
             }
         } catch (error) {
