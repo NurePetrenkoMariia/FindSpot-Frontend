@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useAuth } from '../helpers/AuthHelper';
 import { useParams } from "react-router-dom";
 import "./PublicationDetailsPage.css";
 import ReactModal from 'react-modal';
@@ -10,8 +11,94 @@ function PublicationDetailsPage() {
     const [touristObject, setTouristObject] = useState(null);
     const [reviews, setReviews] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [newReview, setNewReview] = useState({ content: '', rating: 0 });
+    const [newReview, setNewReview] = useState({ content: '', rating: 0, image: null });
+    const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+    const [checkedLists, setCheckedLists] = useState({
+        wantToVisit: false,
+        visited: false,
+    });
+    const { user, isLoggedIn } = useAuth();
+    const userId = user?.id;
 
+    const handleSaveToList = async () => {
+        if (!isLoggedIn || !userId) {
+            alert("Щоб зберегти, увійдіть в акаунт");
+            return;
+        }
+
+        try {
+            const requests = [];
+            if (checkedLists.wantToVisit) {
+                const data = {
+                    userId: user.id.toString(),
+                    blogPostId: post.id,
+                    status: 'WantToVisit'
+                };
+                console.log("Відправка WantToVisit:", data);
+                requests.push(
+                    axios.post('/api/UserBlogPost/add', data, {
+                        withCredentials: true
+                    })
+                );
+            }
+            if (checkedLists.visited) {
+                requests.push(axios.post('/api/UserBlogPost/add', {
+                    userId: user.id.toString(),
+                    blogPostId: post.id,
+                    status: 'Visited'
+                }));
+            }
+
+            await Promise.all(requests);
+            alert("Додано до списку!");
+            closeSaveModal();
+        } catch (error) {
+            console.error("Помилка при додаванні до списку", error);
+            alert("Не вдалося додати до списку");
+        }
+    };
+
+    const handleReviewSubmit = async () => {
+
+        if (!isLoggedIn || !user) {
+            alert("Щоб залишити коментар, увійдіть в акаунт");
+            return;
+        }
+
+        try {
+            const formData = {
+                content: newReview.content,
+                rating: newReview.rating,
+                image: null
+            };
+
+            await sendReviewToServer(formData);
+        } catch (error) {
+            console.error("Помилка при надсиланні відгуку:", error);
+            alert(error.response?.data || "Не вдалося залишити коментар");
+        }
+    }
+
+    const sendReviewToServer = async (data) => {
+        console.log("Дані, які надсилаються на сервер:", data);
+        try {
+            const response = await axios.post(`/api/Reviews/${post.id}`, data, {
+                withCredentials: true
+            });
+
+            setReviews([...reviews, response.data]);
+            closeModal();
+            setNewReview({ content: '', rating: 0, image: null });
+            alert("Коментар додано успішно");
+        } catch (error) {
+            if (error.response?.status === 403) {
+                alert("Ви можете залишити відгук лише про місця, які відвідали.");
+            } else {
+                console.error("Помилка при надсиланні:", error);
+                alert(error.response?.data || "Сталася помилка");
+            }
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -25,8 +112,8 @@ function PublicationDetailsPage() {
                     setTouristObject(objectResponse.data);
                 }
 
-               /* const reviewsResponse = await axios.get(`/api/Reviews/blog/${id}`);
-                setReviews(reviewsResponse.data);*/
+                const reviewsResponse = await axios.get(`/api/Reviews/blog/${id}`);
+                setReviews(reviewsResponse.data);
             } catch (error) {
                 console.error("Помилка при завантаженні даних:", error);
             }
@@ -34,6 +121,12 @@ function PublicationDetailsPage() {
 
         fetchData();
     }, [id]);
+
+    const openSaveModal = () => setIsSaveModalOpen(true);
+    const closeSaveModal = () => {
+        setCheckedLists({ wantToVisit: false, visited: false });
+        setIsSaveModalOpen(false);
+    };
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
@@ -44,6 +137,35 @@ function PublicationDetailsPage() {
 
     return (
         <div className="details-page">
+            <ReactModal
+                isOpen={isSaveModalOpen}
+                onRequestClose={closeSaveModal}
+                contentLabel="Додати в список"
+                className="modal modal-lists"
+                overlayClassName="modal-overlay"
+            >
+                <h2>Додати публікацію до списку</h2>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={checkedLists.wantToVisit}
+                        onChange={(e) => setCheckedLists({ ...checkedLists, wantToVisit: e.target.checked })}
+                    />
+                    Хочу відвідати
+                </label>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={checkedLists.visited}
+                        onChange={(e) => setCheckedLists({ ...checkedLists, visited: e.target.checked })}
+                    />
+                    Відвідано
+                </label>
+                <div className="modal-lists-buttons">
+                    <button onClick={closeSaveModal} className="lists-cancel-btn">Скасувати</button>
+                    <button onClick={handleSaveToList} className="lists-save-btn">Зберегти</button>
+                </div>
+            </ReactModal>
             <div className="details-page_card">
                 <div className="details-page_header">
                     <div>
@@ -52,7 +174,7 @@ function PublicationDetailsPage() {
                             {new Date(post.publishedDate).toLocaleDateString()}
                         </p>
                     </div>
-                    <button className="details-page_save-btn">Зберегти</button>
+                    <button className="details-page_save-btn" onClick={openSaveModal}>Зберегти</button>
                 </div>
 
                 <div className="details-page_tags">
@@ -130,33 +252,33 @@ function PublicationDetailsPage() {
                     className="modal"
                     overlayClassName="modal-overlay"
                 >
-                <h2>Напишіть свій коментар</h2>
+                    <h2>Напишіть свій коментар</h2>
 
-                <textarea
-                    placeholder="Ваш коментар..."
-                    value={newReview.content}
-                    onChange={(e) => setNewReview({ ...newReview, content: e.target.value })}
-                />
-                <div>
-                    <label>Оцінка: </label>
-                    {[1, 2, 3, 4, 5].map((star) => (
-                        <span
-                            key={star}
-                            onClick={() => setNewReview({ ...newReview, rating: star })}
-                            style={{
-                                cursor: 'pointer',
-                                color: star <= newReview.rating ? '#FFD700' : '#ccc',
-                                fontSize: '24px',
-                            }}
-                        >
-                            ★
-                        </span>
-                    ))}
-                </div>
-                <button /*onClick={handleReviewSubmit}*/>Зберегти</button>
-                <button onClick={closeModal}>Скасувати</button>
-            </ReactModal>
-        </div>
+                    <textarea
+                        placeholder="Ваш коментар..."
+                        value={newReview.content}
+                        onChange={(e) => setNewReview({ ...newReview, content: e.target.value })}
+                    />
+                    <div>
+                        <label>Оцінка: </label>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                            <span
+                                key={star}
+                                onClick={() => setNewReview({ ...newReview, rating: star })}
+                                style={{
+                                    cursor: 'pointer',
+                                    color: star <= newReview.rating ? '#FFD700' : '#ccc',
+                                    fontSize: '24px',
+                                }}
+                            >
+                                ★
+                            </span>
+                        ))}
+                    </div>
+                    <button onClick={closeModal}>Скасувати</button>
+                    <button onClick={handleReviewSubmit}>Зберегти</button>
+                </ReactModal>
+            </div>
 
         </div >
     );

@@ -16,7 +16,8 @@ export const AuthProvider = ({ children }) => {
         setUser({
           id: res.data.id,
           userName: res.data.userName,
-          email: res.data.email
+          email: res.data.email,
+          roles: res.data.roles
         });
       } else {
         setUser(null);
@@ -33,6 +34,8 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     console.log('Auth status:', isLoggedIn);
+    console.log("user object from useAuth:", user);
+
   }, [isLoggedIn]);
 
   return (

@@ -31,12 +31,13 @@ function Header() {
             </>
           ) : (
             <>
-            <li><button className="header_logout" onClick={handleLogout}>Вийти</button></li>
+            <li><Link to="/my-lists">Мої списки</Link></li>
             <li>
               <Link to="/profile" className="header_profile_icon">
                 <FaUserCircle size={24} />
               </Link>
             </li>
+            <li><button className="header_logout" onClick={handleLogout}>Вийти</button></li>
             </>
           )}
         </ul>
