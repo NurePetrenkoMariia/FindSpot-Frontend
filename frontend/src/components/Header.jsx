@@ -2,6 +2,7 @@ import './Header.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../helpers/AuthHelper';
 import axios from 'axios';
+import { FaUserCircle } from 'react-icons/fa';
 
 function Header() {
   const { isLoggedIn, setIsLoggedIn } = useAuth();
@@ -22,14 +23,21 @@ function Header() {
       <h1>FindSpot</h1>
       <nav>
         <ul>
-          <li><Link to="/">Головна</Link></li>
+          <li><Link to="/posts">Головна</Link></li>
           {!isLoggedIn ? (
             <>
               <li><Link to="/register">Зареєструватися</Link></li>
               <li className="header_login"><Link to="/login">Увійти</Link></li>
             </>
           ) : (
+            <>
             <li><button className="header_logout" onClick={handleLogout}>Вийти</button></li>
+            <li>
+              <Link to="/profile" className="header_profile_icon">
+                <FaUserCircle size={24} />
+              </Link>
+            </li>
+            </>
           )}
         </ul>
       </nav>

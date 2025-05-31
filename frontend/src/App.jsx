@@ -8,6 +8,9 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import PublicationsListPage from './pages/PublicationsListPage';
 import AddPublicationPage from './pages/AddPublicationPage';
+import PublicationDetailsPage from './pages/PublicationDetailsPage';
+import ProfilePage from './pages/ProfilePage';
+import MyListsPage from './pages/MyListsPage';
 
 function App() {
 
@@ -22,7 +25,10 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/posts" element={<PublicationsListPage />}/>
-               <Route path="/posts/add" element={<AddPublicationPage />}/>
+              <Route path="/posts/add" element={<AddPublicationPage />}/>
+              <Route path="/posts/:id" element={<PublicationDetailsPage />}/>
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/my-lists" element={<MyListsPage />} />
             </Routes>
           </main>
           <Footer />

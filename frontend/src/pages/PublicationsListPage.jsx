@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import './PublicationsListPage.css';
-import { useNavigate,useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function PublicationsListPage() {
 
@@ -18,8 +18,9 @@ function PublicationsListPage() {
     const [appliedCountries, setAppliedCountries] = useState([]);
 
     const [publications, setPublications] = useState([]);
+    const [countries, setCountries] = useState([]);
 
-    const fakeCountries = ["Україна", "Англія", "Єгипет", "Ірландія", "Франція", "Італія"];
+    //const fakeCountries = ["Україна", "Англія", "Єгипет", "Ірландія", "Франція", "Італія"];
 
     useEffect(() => {
         const fetchPublications = async () => {
@@ -34,10 +35,23 @@ function PublicationsListPage() {
         fetchPublications();
     }, []);
 
+    useEffect(() => {
+        const fetchCountries = async () => {
+            try {
+                const response = await axios.get("/api/TouristObjects/countries");
+                setCountries(response.data.sort());
+            } catch (err) {
+                console.error("Помилка при завантаженні країн:", err);
+            }
+        };
+
+        fetchCountries();
+    }, []);
+
     const filteredPublications = publications.filter((pub) => {
         const countryMatch =
             appliedCountries.length === 0 ||
-            appliedCountries.includes(pub.touristObject?.countryName || "");
+            appliedCountries.includes(pub.touristObject?.country || "");
 
         const titleMatch = pub.pageTitle
             .toLowerCase()
@@ -72,7 +86,7 @@ function PublicationsListPage() {
     };
 
     const handleAdding = () => {
-         navigate(`/posts/add`);
+        navigate(`/posts/add`);
     }
     return (
         <>
@@ -97,7 +111,7 @@ function PublicationsListPage() {
                 <aside className="blogPosts-container-filters">
                     <h2>Фільтри</h2>
                     <p>Оберіть країну</p>
-                    {fakeCountries.map((country) => (
+                    {countries.map((country) => (
                         <label key={country}>
                             <input
                                 type="checkbox"

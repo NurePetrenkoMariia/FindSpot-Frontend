@@ -44,3 +44,14 @@
   color: #ffffff;
   padding: 2px 12px;
 }
+
+.header_profile_icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+.header_profile_icon:hover {
+  color: #E56E0C;
+}

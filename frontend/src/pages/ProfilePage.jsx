@@ -5,16 +5,23 @@ import './ProfilePage.css';
 
 function ProfilePage() {
     const { user, isLoggedIn } = useAuth();
+    console.log("user object from useAuth:", user);
     const [userData, setUserData] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
+    
+
     const [form, setForm] = useState({
         userName: '',
         email: '',
         avatarImageUrl: '',
+        currentPassword: '',
+        newPassword: '',
+        confirmNewPassword: ''
     });
     useEffect(() => {
         const fetchProfile = async () => {
             if (!isLoggedIn || !user) return;
+            console.log('user:', user);
 
             try {
                 const res = await axios.get(`/api/user/${user.id}`, {
@@ -34,6 +41,10 @@ function ProfilePage() {
         fetchProfile();
     }, [user, isLoggedIn]);
 
+     if (!isLoggedIn || !user || !userData) {
+        return <div>Завантаження профілю...</div>;
+    }
+
     const handleChange = (e) => {
         setForm({
             ...form,
@@ -43,7 +54,18 @@ function ProfilePage() {
 
     const handleSave = async () => {
         try {
-            const res = await axios.put(`/api/user/${user.id}`, {
+            if (form.currentPassword && form.newPassword && form.confirmNewPassword) {
+                const passwordRes = await axios.post('/api/user/me/change-password', {
+                    currentPassword: form.currentPassword,
+                    newPassword: form.newPassword,
+                    confirmNewPassword: form.confirmNewPassword
+                }, {
+                    withCredentials: true
+                });
+
+                alert('Пароль змінено успішно');
+            }
+            const res = await axios.put(`/api/user/me`, {
                 ...userData,
                 userName: form.userName,
                 email: form.email,
@@ -57,6 +79,9 @@ function ProfilePage() {
                 userName: res.data.userName,
                 email: res.data.email,
                 avatarImageUrl: res.data.avatarImageUrl || '',
+                currentPassword: '',
+                newPassword: '',
+                confirmNewPassword: ''
             });
             setIsEditing(false);
         } catch (err) {
@@ -89,9 +114,6 @@ function ProfilePage() {
         }
     };
 
-    if (!userData) {
-        return <div>Завантаження профілю...</div>;
-    }
 
     return (
         <>
@@ -201,8 +223,8 @@ function ProfilePage() {
 
                 {isEditing && (
                     <div className="profile-buttons">
-                        <button className="profile-button-save" onClick={handleSave}>Зберегти</button>
                         <button className='profile-button-cancel' onClick={() => setIsEditing(false)}>Скасувати</button>
+                        <button className="profile-button-save" onClick={handleSave}>Зберегти</button>
                     </div>
                 )}
 
