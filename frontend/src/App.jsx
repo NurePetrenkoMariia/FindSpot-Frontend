@@ -11,9 +11,14 @@ import AddPublicationPage from './pages/AddPublicationPage';
 import PublicationDetailsPage from './pages/PublicationDetailsPage';
 import ProfilePage from './pages/ProfilePage';
 import MyListsPage from './pages/MyListsPage';
+import AdminPanelPage from './pages/AdminPanelPage';
+import BlogPostTable from './components/admin/BlogPostTable';
+import UserTable from './components/admin/UserTable';
+import ObjectTable from './components/admin/ObjectTable';
+import UserPostTable from './components/admin/UserPostTable';
+import RequireAdmin from './helpers/RequireAdmin';
 
 function App() {
-
   return (
     <>
       <div className="app_container">
@@ -24,11 +29,18 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
-              <Route path="/posts" element={<PublicationsListPage />}/>
-              <Route path="/posts/add" element={<AddPublicationPage />}/>
-              <Route path="/posts/:id" element={<PublicationDetailsPage />}/>
+              <Route path="/posts" element={<PublicationsListPage />} />
+              <Route path="/posts/add" element={<AddPublicationPage />} />
+              <Route path="/posts/:id" element={<PublicationDetailsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/my-lists" element={<MyListsPage />} />
+              <Route path="/admin" element={<RequireAdmin><AdminPanelPage /></RequireAdmin>}>
+                <Route path="blog-posts" element={<BlogPostTable />} />
+                <Route path="users" element={<UserTable />} />
+                <Route path="objects" element={<ObjectTable />} />
+                <Route path="user-posts" element={<UserPostTable />} />
+              </Route>
+
             </Routes>
           </main>
           <Footer />

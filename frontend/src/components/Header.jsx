@@ -5,8 +5,12 @@ import axios from 'axios';
 import { FaUserCircle } from 'react-icons/fa';
 
 function Header() {
-  const { isLoggedIn, setIsLoggedIn } = useAuth();
-  const navigate = useNavigate();
+  const { isLoggedIn, setIsLoggedIn, user, isLoading } = useAuth();
+  const navigate = useNavigate(); 
+
+  if (isLoading) return <div className="loader">Завантаження...</div>;
+
+  const isAdminOrManager = user?.roles?.includes('Admin') || user?.roles?.includes('Manager');
 
   const handleLogout = async () => {
     try {
@@ -31,13 +35,16 @@ function Header() {
             </>
           ) : (
             <>
-            <li><Link to="/my-lists">Мої списки</Link></li>
-            <li>
-              <Link to="/profile" className="header_profile_icon">
-                <FaUserCircle size={24} />
-              </Link>
-            </li>
-            <li><button className="header_logout" onClick={handleLogout}>Вийти</button></li>
+              {isAdminOrManager && (
+                <li><Link to="/admin">Адмін-панель</Link></li>
+              )}
+              <li><Link to="/my-lists">Мої списки</Link></li>
+              <li>
+                <Link to="/profile" className="header_profile_icon">
+                  <FaUserCircle size={24} />
+                </Link>
+              </li>
+              <li><button className="header_logout" onClick={handleLogout}>Вийти</button></li>
             </>
           )}
         </ul>

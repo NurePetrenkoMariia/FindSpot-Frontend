@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+.admin-panel {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.admin-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem;
+  background-color:#F4E8DC;
+}
+
+.admin-nav a {
+  color: #053B29;;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.admin-nav a:hover {
+  background-color: #E56E0C;; 
+  color: #ffffff;
+}
+
+.admin-nav a.active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.admin-content {
+  padding: 2rem;
+  background-color: #F4E8DC; 
+  min-height: 80vh;
+  color: #1e293b; 
+  border-radius: 0 0 12px 12px;
+}
