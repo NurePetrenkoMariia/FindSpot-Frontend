@@ -6,7 +6,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); 
+  const [isLoading, setIsLoading] = useState(true);
 
   const checkAuthStatus = async () => {
     try {
@@ -18,7 +18,8 @@ export const AuthProvider = ({ children }) => {
           id: res.data.id,
           userName: res.data.userName,
           email: res.data.email,
-          roles: res.data.roles
+          roles: res.data.roles,
+          accountVerified: res.data.accountVerified
         });
       } else {
         setUser(null);
@@ -27,7 +28,7 @@ export const AuthProvider = ({ children }) => {
       setIsLoggedIn(false);
       setUser(null);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
@@ -39,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     console.log('Auth status:', isLoggedIn);
     console.log("user object from useAuth:", user);
 
-  }, [isLoggedIn]);
+  }, [isLoggedIn, user]);
 
   return (
     <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, user, setUser, checkAuthStatus, isLoading }}>

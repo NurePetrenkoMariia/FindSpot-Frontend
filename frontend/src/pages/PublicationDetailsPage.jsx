@@ -4,14 +4,17 @@ import { useAuth } from '../helpers/AuthHelper';
 import { useParams } from "react-router-dom";
 import "./PublicationDetailsPage.css";
 import ReactModal from 'react-modal';
+import { useNavigate } from "react-router-dom";
 
 function PublicationDetailsPage() {
+    const navigate = useNavigate();
     const { id } = useParams();
     const [post, setPost] = useState(null);
     const [touristObject, setTouristObject] = useState(null);
     const [reviews, setReviews] = useState([]);
+    const [selectedFile, setSelectedFile] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [newReview, setNewReview] = useState({ content: '', rating: 0, image: null });
+    const [newReview, setNewReview] = useState({ content: '', rating: 0, featuredImageUrl: null });
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
     const [checkedLists, setCheckedLists] = useState({
         wantToVisit: false,
@@ -69,7 +72,7 @@ function PublicationDetailsPage() {
             const formData = {
                 content: newReview.content,
                 rating: newReview.rating,
-                image: null
+                featuredImageUrl: newReview.featuredImageUrl || null
             };
 
             await sendReviewToServer(formData);
@@ -86,9 +89,14 @@ function PublicationDetailsPage() {
                 withCredentials: true
             });
 
+            if (newReview.featuredImageUrl && !user.accountVerified) {
+                alert("Лише верифіковані користувачі можуть додавати фото до коментарів.");
+                return;
+            }
+
             setReviews([...reviews, response.data]);
             closeModal();
-            setNewReview({ content: '', rating: 0, image: null });
+            setNewReview({ content: '', rating: 0, featuredImageUrl: null });
             alert("Коментар додано успішно");
         } catch (error) {
             if (error.response?.status === 403) {
@@ -135,6 +143,49 @@ function PublicationDetailsPage() {
         return <div className="details-page__loading">Завантаження...</div>;
     }
 
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setSelectedFile(file);
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const res = await axios.post('/api/Image', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                withCredentials: true
+            });
+
+            setNewReview((prevForm) => ({
+                ...prevForm,
+                featuredImageUrl: res.data.link,
+            }));
+            setSelectedFile(null);
+        } catch (error) {
+            console.error('Помилка при завантаженні зображення:', error);
+            alert('Не вдалося завантажити зображення');
+        }
+    };
+
+    const handleDelete = async () => {
+        const confirmDelete = window.confirm("Ви дійсно хочете видалити цю публікацію?");
+        if (!confirmDelete) return;
+
+        try {
+            await axios.delete(`/api/BlogPosts/${post.id}`, {
+                withCredentials: true
+            });
+
+            alert("Публікацію видалено");
+            navigate(`/posts`);
+        } catch (error) {
+            console.error("Помилка при видаленні публікації:", error);
+            alert("Не вдалося видалити публікацію");
+        }
+    };
+
     return (
         <div className="details-page">
             <ReactModal
@@ -177,14 +228,29 @@ function PublicationDetailsPage() {
                     <button className="details-page_save-btn" onClick={openSaveModal}>Зберегти</button>
                 </div>
 
-                <div className="details-page_tags">
-                    {post.tags?.map((tag, index) => (
-                        <span key={index} className="details-page_tag">
-                            {tag.name}
-                        </span>
-                    ))}
-                </div>
+                <div className="details-page_tags_buttons-section">
+                    <div className="details-page_tags">
+                        {post.tags?.map((tag, index) => (
+                            <span key={index} className="details-page_tag">
+                                {tag.name}
+                            </span>
+                        ))}
+                    </div>
+                    {user && (
+                        <div className="details-page__actions">
+                            {user.id === post.userId && (
+                                <>
+                                    <button className="btn-post-edit" onClick={() => navigate(`/edit-publication/${post.id}`)}>Редагувати</button>
+                                    <button className="btn-post-delete" onClick={handleDelete}>Видалити</button>
+                                </>
+                            )}
 
+                            {(user.role === "Moderator" || user.role === "Administrator") && user.id !== post.userId && (
+                                <button className="btn-post-delete" onClick={handleDelete}>Видалити</button>
+                            )}
+                        </div>
+                    )}
+                </div>
                 <img
                     src={post.featuredImageUrl}
                     alt="Зображення публікації"
@@ -259,6 +325,17 @@ function PublicationDetailsPage() {
                         value={newReview.content}
                         onChange={(e) => setNewReview({ ...newReview, content: e.target.value })}
                     />
+                    {user?.accountVerified && (
+                        <div className="review-image-upload">
+                            <label>Фото:</label>
+                            <input
+                                type="file"
+                                id="review-photo-upload"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                            />
+                        </div>
+                    )}
                     <div>
                         <label>Оцінка: </label>
                         {[1, 2, 3, 4, 5].map((star) => (
@@ -276,7 +353,7 @@ function PublicationDetailsPage() {
                         ))}
                     </div>
                     <button onClick={closeModal}>Скасувати</button>
-                    <button onClick={handleReviewSubmit}>Зберегти</button>
+                    <button onClick={handleReviewSubmit} disabled={newReview.featuredImageUrl === null && selectedFile !== null}>Зберегти</button>
                 </ReactModal>
             </div>
 

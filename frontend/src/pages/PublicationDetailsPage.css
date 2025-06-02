@@ -72,16 +72,16 @@
 
 .details-page_object-info h3 {
     margin-top: 0;
-    font-size: 22px;
+    font-size: 18px;
 }
 
 .details-page_object-info p {
     margin-top: 10px;
-    font-size: 18px;
+    font-size: 15px;
 }
 
 .details-page_content {
-    font-size: 18px;
+    font-size: 15px;
     line-height: 1.5;
     text-align: justify;
 }
@@ -156,7 +156,8 @@
 
 .review-card_image {
     max-width: 100%;
-    height: auto;
+    height: 200px;
+    object-fit: cover;
     border-radius: 8px;
     margin-top: 10px;
 }
@@ -221,4 +222,41 @@
 .modal button:last-of-type {
     background-color: #18be5d;
     color: white;
+}
+
+.btn-post-edit {
+    background-color: #18be5d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.btn-post-edit:hover {
+    background-color: #24a158;
+}
+
+.btn-post-delete {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    margin-right: 0;
+    cursor: pointer;
+}
+
+.btn-post-delete:hover {
+    background-color: rgb(166, 2, 2);
+}
+
+.details-page_tags_buttons-section {
+    display: flex;
+    justify-content: space-between;
+}
+
+.details-page__actions button {
+    margin: 15px 10px;
+    margin-right: 0px;
 }

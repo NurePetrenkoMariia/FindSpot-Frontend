@@ -35,34 +35,6 @@ function BlogPostTable() {
         }
     };
 
-    const parseTags = (tagsStr) =>
-        tagsStr
-            .split(',')
-            .map(t => t.trim())
-            .filter(t => t.length > 0)
-            .map(name => ({ name }));
-
-
-    const handleSaveClick = async () => {
-        try {
-            const updatedPost = {
-                pageTitle: editFormData.pageTitle,
-                shortDescription: editFormData.shortDescription,
-                content: editFormData.content,
-                featuredImageUrl: editFormData.featuredImageUrl,
-                publishedDate: new Date(editFormData.publishedDate).toISOString(),
-                touristObjectId: editFormData.touristObjectId || null,
-                tags: parseTags(editFormData.tags),
-            };
-
-            await axios.put(`/api/BlogPosts/${editingId}`, updatedPost, { withCredentials: true });
-
-            setEditingId(null);
-            fetchPosts();
-        } catch (error) {
-            alert('Помилка збереження');
-        }
-    };
     if (loading) return <p>Завантаження...</p>;
     if (error) return <p>{error}</p>;
 

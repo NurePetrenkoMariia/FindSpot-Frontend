@@ -1,34 +1,46 @@
 import './AddPublicationPage.css';
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
-function AddPublicationPage() {
+function EditPublicationPage() {
+    const { id } = useParams();
     const [title, setTitle] = useState("");
     const [imageUrl, setImageUrl] = useState("");
     const [description, setDescription] = useState("");
     const [content, setContent] = useState("");
     const [tags, setTags] = useState("");
     const [touristObjects, setTouristObjects] = useState([]);
-    const [selectedObjectId, setSelectedObjectId] = useState(null);
     const [searchText, setSearchText] = useState("");
-    const [showSuggestions, setShowSuggestions] = useState(true);
+    const [selectedObjectId, setSelectedObjectId] = useState(null);
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
 
     useEffect(() => {
-        const fetchTouristObjects = async () => {
+        const fetchInitialData = async () => {
             try {
-                const response = await axios.get('/api/BlogPosts/tourist-objects', {
-                    withCredentials: true
-                });
-                setTouristObjects(response.data);
-            } catch (error) {
-                setError("Не вдалося завантажити туристичні об'єкти");
+                const [postRes, objectsRes] = await Promise.all([
+                    axios.get(`/api/BlogPosts/${id}`, { withCredentials: true }),
+                    axios.get('/api/BlogPosts/tourist-objects', { withCredentials: true })
+                ]);
+
+                const post = postRes.data;
+                setTitle(post.pageTitle);
+                setImageUrl(post.featuredImageUrl);
+                setDescription(post.shortDescription);
+                setContent(post.content);
+                setTags(post.tags.map(t => t.name).join(", "));
+                setSearchText(post.touristObject?.name || "");
+                setSelectedObjectId(post.touristObjectId || null);
+                setTouristObjects(objectsRes.data);
+            } catch (err) {
+                setError("Не вдалося завантажити дані для редагування.");
             }
         };
 
-        fetchTouristObjects();
-    }, []);
+        fetchInitialData();
+    }, [id]);
 
     const filteredObjects = touristObjects.filter(obj =>
         obj.name.toLowerCase().includes(searchText.toLowerCase())
@@ -36,36 +48,30 @@ function AddPublicationPage() {
 
     const handleFileChange = async (e) => {
         const file = e.target.files[0];
-
-        if (!file) {
-            return;
-        }
+        if (!file) return;
 
         const formData = new FormData();
         formData.append('file', file);
 
         try {
             const response = await axios.post('/api/Image', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                },
+                headers: { 'Content-Type': 'multipart/form-data' },
                 withCredentials: true
             });
-
             if (response.data.link) {
                 setImageUrl(response.data.link);
             } else {
                 setError('Помилка при завантаженні зображення');
             }
-        } catch (err) {
+        } catch {
             setError('Помилка при завантаженні зображення');
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setSuccessMessage('');
         setError('');
+        setSuccessMessage('');
 
         const exactMatch = touristObjects.find(
             (obj) => obj.name.toLowerCase() === searchText.trim().toLowerCase()
@@ -81,7 +87,8 @@ function AddPublicationPage() {
             return;
         }
 
-        const newPublication = {
+        const updatedPost = {
+            id,
             pageTitle: title,
             shortDescription: description,
             content: content,
@@ -92,92 +99,52 @@ function AddPublicationPage() {
         };
 
         try {
-            const response = await axios.post('/api/BlogPosts', newPublication, {
+            const response = await axios.put(`/api/BlogPosts/${id}`, updatedPost, {
                 withCredentials: true
             });
 
-            if (response.status === 201) {
-                setSuccessMessage("Публікацію успішно додано!");
-                setTitle("");
-                setImageUrl("");
-                setDescription("");
-                setContent("");
-                setTags("");
-                setSelectedObjectId(null);
-                setSearchText("");
+            if (response.status === 200) {
+                setSuccessMessage("Публікацію оновлено!");
             }
-        } catch (error) {
-            setError("Помилка при додаванні публікації");
+        } catch {
+            setError("Помилка при оновленні публікації.");
         }
     };
 
     return (
         <div className="add-publication">
             <div className='add-publication_card'>
-                <h2 className='add-publication_card-title'>Створіть нову публікацію</h2>
+                <h2 className='add-publication_card-title'>Редагування публікації</h2>
 
                 <form onSubmit={handleSubmit} className='add-publication_form'>
                     <div className="add-publication_card-field">
-                        <label>
-                            Назва*:
-                            <input
-                                type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                required
-                            />
+                        <label>Назва*:
+                            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
                         </label>
                     </div>
 
                     <div className="add-publication_card-field">
-                        <label>
-                            Фото*:
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileChange}
-                            />
+                        <label>Фото*:
+                            <input type="file" accept="image/*" onChange={handleFileChange} />
                         </label>
-                        {imageUrl && (
-                            <img
-                                src={imageUrl}
-                                alt="Превʼю"
-                                width="200"
-                                style={{ marginTop: '10px' }}
-                            />
-                        )}
+                        {imageUrl && <img src={imageUrl} alt="Превʼю" width="200" style={{ marginTop: '10px' }} />}
                     </div>
 
                     <div className="add-publication_card-field">
-                        <label>
-                            Короткий опис*:
-                            <textarea
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                required
-                            />
+                        <label>Короткий опис*:
+                            <textarea value={description} onChange={(e) => setDescription(e.target.value)} required />
                         </label>
                     </div>
 
                     <div className="add-publication_card-field">
-                        <label>
-                            Текст*:
-                            <textarea
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                required
-                            />
+                        <label>Текст*:
+                            <textarea value={content} onChange={(e) => setContent(e.target.value)} required />
                         </label>
                     </div>
+
                     <div className="add-publication_card-field">
-                        <label>
-                            Теги (через кому):
-                            <input
-                                type="text"
-                                value={tags}
-                                onChange={(e) => setTags(e.target.value)}
-                                placeholder="приклад: історія, архітектура, музей"
-                            />
+                        <label>Теги (через кому):
+                            <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} />
                         </label>
                     </div>
 
@@ -202,7 +169,6 @@ function AddPublicationPage() {
                                         setShowSuggestions(false);
                                     } else {
                                         setSelectedObjectId(null);
-                                        setShowSuggestions(true);
                                     }
                                 }}
                                 placeholder="Почніть вводити назву"
@@ -226,27 +192,19 @@ function AddPublicationPage() {
                                     ))}
                                 </ul>
                             )}
-
                         </div>
                     </div>
 
                     <button type="submit" className="add-publication_card-button">
-                        Додати публікацію
+                        Оновити публікацію
                     </button>
                 </form>
             </div>
-            {error && (
-                <div className="form-error-message">
-                    {error}
-                </div>
-            )}
 
-            {successMessage &&
-                <div className="form-success-message">{successMessage}</div>
-            }
-
+            {error && <div className="form-error-message">{error}</div>}
+            {successMessage && <div className="form-success-message">{successMessage}</div>}
         </div>
     );
 }
 
-export default AddPublicationPage;
+export default EditPublicationPage;
