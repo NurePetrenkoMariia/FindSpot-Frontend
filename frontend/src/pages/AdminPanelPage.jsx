@@ -8,7 +8,7 @@ function AdminPanel() {
         <Link to="/admin/blog-posts">Публікації</Link>
         <Link to="/admin/users">Користувачі</Link>
         <Link to="/admin/objects">Туристичні об'єкти</Link>
-        <Link to="#">Теги</Link>
+        <Link to="/admin/tags">Теги</Link>
       </nav>
       <hr />
       <div className="admin-content">

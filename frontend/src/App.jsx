@@ -17,6 +17,7 @@ import UserTable from './components/admin/UserTable';
 import ObjectTable from './components/admin/ObjectTable';
 import RequireAdmin from './helpers/RequireAdmin';
 import EditPublicationPage from './pages/EditPublicationPage';
+import TagsTable from './components/admin/TagsTable';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
                 <Route path="blog-posts" element={<BlogPostTable />} />
                 <Route path="users" element={<UserTable />} />
                 <Route path="objects" element={<ObjectTable />} />
+                <Route path="tags" element={<TagsTable />} />
               </Route>
               <Route path="/edit-publication/:id" element={<EditPublicationPage />} />
             </Routes>
