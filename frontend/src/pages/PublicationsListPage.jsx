@@ -20,7 +20,7 @@ function PublicationsListPage() {
     const [publications, setPublications] = useState([]);
     const [countries, setCountries] = useState([]);
 
-    //const fakeCountries = ["Україна", "Англія", "Єгипет", "Ірландія", "Франція", "Італія"];
+    const [sortOption, setSortOption] = useState("");
 
     useEffect(() => {
         const fetchPublications = async () => {
@@ -62,7 +62,21 @@ function PublicationsListPage() {
         );
 
         return countryMatch && (titleMatch || tagsMatch);
-    });
+    })
+        .sort((a, b) => {
+            switch (sortOption) {
+                case "newest":
+                    return new Date(b.publishedDate) - new Date(a.publishedDate);
+                case "oldest":
+                    return new Date(a.publishedDate) - new Date(b.publishedDate);
+                case "rating_desc":
+                    return (b.averageRating || 0) - (a.averageRating || 0);
+                case "rating_asc":
+                    return (a.averageRating || 0) - (b.averageRating || 0);
+                default:
+                    return 0;
+            }
+        });
 
     const handleCountryChange = (e) => {
         const value = e.target.value;
@@ -127,8 +141,8 @@ function PublicationsListPage() {
                     <div className="blogPosts-container-sort">
                         <label>Сортувати за: </label>
                         <select
-                        /*value={sortOption}
-                        onChange={(e) => setSortOption(e.target.value)}*/
+                            value={sortOption}
+                            onChange={(e) => setSortOption(e.target.value)}
                         >
                             <option value="">Оберіть параметри сортування</option>
                             <option value="newest">Від нових до старих</option>
@@ -162,6 +176,7 @@ function PublicationsListPage() {
                                             ))}
                                         </div>
                                         <p>{post.touristObject?.country || "Невідомо"}</p>
+                                        <p>Середня оцінка: {post.averageRating}</p>
                                         <p>{post.shortDescription}</p>
                                     </div>
                                     <button className="blogPost-container_list-details_button" onClick={() => handleDetails(post.id)}>Деталі публікації</button>

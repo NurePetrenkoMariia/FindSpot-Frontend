@@ -245,7 +245,7 @@ function PublicationDetailsPage() {
                                 </>
                             )}
 
-                            {(user.role === "Moderator" || user.role === "Administrator") && user.id !== post.userId && (
+                            {(user.roles?.includes("Admin") || user.roles?.includes("Moderator")) && user.id !== post.userId && (
                                 <button className="btn-post-delete" onClick={handleDelete}>Видалити</button>
                             )}
                         </div>
