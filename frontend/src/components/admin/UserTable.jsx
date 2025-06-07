@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ReactModal from 'react-modal';
 import './AdminTables.css';
+import { useAuth } from '../../helpers/AuthHelper';
 
 function UserTable() {
+  const { user } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -162,7 +164,9 @@ function UserTable() {
     <div className="admin-table-container">
       <div className="admin-table-top-section">
         <h2>Користувачі</h2>
-        <button onClick={() => setIsCreateModalOpen(true)} className="add-button">Додати користувача</button>
+        {user?.roles?.includes('Admin') && (
+          <button onClick={() => setIsCreateModalOpen(true)} className="add-button">Додати користувача</button>
+        )}
       </div>
 
       <ReactModal

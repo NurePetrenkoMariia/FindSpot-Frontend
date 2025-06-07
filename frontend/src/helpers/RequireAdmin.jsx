@@ -10,7 +10,7 @@ const RequireAdmin = ({ children }) => {
     return <div className="loader">Завантаження...</div>;
   }
 
-  const isAdmin = user?.roles?.includes('Admin') || user?.roles?.includes('Manager');
+  const isAdmin = user?.roles?.includes('Admin') || user?.roles?.includes('Moderator');
 
   if (!isAdmin) {
     return <Navigate to="/login" />;

@@ -10,7 +10,7 @@ function Header() {
 
   if (isLoading) return <div className="loader">Завантаження...</div>;
 
-  const isAdminOrManager = user?.roles?.includes('Admin') || user?.roles?.includes('Manager');
+  const isAdminOrModerator= user?.roles?.includes('Admin') || user?.roles?.includes('Moderator');
 
   const handleLogout = async () => {
     try {
@@ -35,7 +35,7 @@ function Header() {
             </>
           ) : (
             <>
-              {isAdminOrManager && (
+              {isAdminOrModerator && (
                 <li><Link to="/admin">Адмін-панель</Link></li>
               )}
               <li><Link to="/my-lists">Мої списки</Link></li>
