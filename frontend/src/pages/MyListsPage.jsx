@@ -31,6 +31,19 @@ function MyListsPage() {
     const visited = list.filter(item => item.status?.toLowerCase() === 'visited');
     const wantToVisit = list.filter(item => item.status?.toLowerCase() === 'wanttovisit');
 
+    const handleRemove = async (blogPostId) => {
+        try {
+            await axios.delete(`/api/UserBlogPost/remove/${blogPostId}`, {
+                withCredentials: true
+            });
+            setList(prev => prev.filter(item => item.blogPostId !== blogPostId));
+        } catch (error) {
+            console.error("Помилка при видаленні:", error);
+            alert("Не вдалося видалити.");
+        }
+    };
+
+
     return (
         <div className="my-lists-page">
             <h2>Мої списки</h2>
@@ -39,9 +52,19 @@ function MyListsPage() {
                 <h3>Хочу відвідати</h3>
                 {wantToVisit.length === 0 ? <p>Пусто</p> :
                     wantToVisit.map(item =>
-                        <div key={item.blogPostId}
+                        <div key={item.blogPostId} className='list-item'
                             onClick={() => handleClick(item.blogPostId)}>
-                            {item.blogPost?.pageTitle}
+                            {item.blogPost?.touristObjectTitle}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    const confirmed = window.confirm("Ви дійсно хочете видалити цей запис?");
+                                    if (confirmed) {
+                                        handleRemove(item.blogPostId);
+                                    }
+                                }}>
+                                Видалити
+                            </button>
                         </div>)}
             </div>
 
@@ -49,9 +72,19 @@ function MyListsPage() {
                 <h3>Відвідано</h3>
                 {visited.length === 0 ? <p>Пусто</p> :
                     visited.map(item =>
-                        <div key={item.blogPostId}
+                        <div key={item.blogPostId} className='list-item'
                             onClick={() => handleClick(item.blogPostId)}>
-                            {item.blogPost?.pageTitle}
+                            {item.blogPost?.touristObjectTitle}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                   const confirmed = window.confirm("Ви дійсно хочете видалити цей запис?");
+                                    if (confirmed) {
+                                        handleRemove(item.blogPostId);
+                                    }
+                                }}>
+                                Видалити
+                            </button>
                         </div>)}
             </div>
         </div>

@@ -1,4 +1,13 @@
 .footer{
     background-color: #053B29;
     color: white;
+    padding: 13px 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer p{
+    margin: 5px 0px;
 }
