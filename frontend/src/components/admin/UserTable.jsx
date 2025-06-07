@@ -16,6 +16,8 @@ function UserTable() {
     email: '',
     avatarImageUrl: '',
     accountVerified: false,
+    isLocked: false,
+    lockDuration: 'Unban',
   });
 
   const [createFormData, setCreateFormData] = useState({
@@ -65,6 +67,7 @@ function UserTable() {
       email: user.email || '',
       avatarImageUrl: user.avatarImageUrl || '',
       accountVerified: user.accountVerified || false,
+      lockDuration: user.lockoutEnd && new Date(user.lockoutEnd) > new Date() ? 'Forever' : 'Unban',
     });
   };
 
@@ -82,7 +85,13 @@ function UserTable() {
         accountVerified: editFormData.accountVerified,
       };
 
-      await axios.put(`/api/User/${editingId}`, updatedUser, { withCredentials: true });
+      const response = await axios.put(`/api/User/${editingId}`, updatedUser, { withCredentials: true });
+      console.log('Оновлено користувача:', response.data);
+
+      if (editFormData.lockDuration) {
+        await handleLockUnlock(editingId, editFormData.lockDuration);
+        console.log('Зміна статусу блокування виконана');
+      }
       setEditingId(null);
       fetchUsers();
     } catch (error) {
@@ -134,6 +143,15 @@ function UserTable() {
       setImageUploadError(null);
     } catch (error) {
       setImageUploadError('Помилка при завантаженні зображення');
+    }
+  };
+
+  const handleLockUnlock = async (id, duration) => {
+    try {
+      await axios.post(`/api/User/lock-unlock/${id}?duration=${duration}`, {}, { withCredentials: true });
+      fetchUsers();
+    } catch (error) {
+      alert('Помилка зміни статусу користувача');
     }
   };
 
@@ -199,6 +217,7 @@ function UserTable() {
             <th>Email</th>
             <th>Фото профілю (URL)</th>
             <th>Верифікований</th>
+            <th>Статус</th>
             <th>Дії</th>
           </tr>
         </thead>
@@ -229,6 +248,27 @@ function UserTable() {
                     />
                   </td>
                   <td>
+                    <select
+                      name="lockDuration"
+                      value={editFormData.lockDuration || 'Unban'}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setEditFormData((prev) => ({
+                          ...prev,
+                          isLocked: value !== 'Unban',
+                          lockDuration: value,
+                        }));
+                      }}
+                    >
+                      <option value="Unban">Розблокувати</option>
+                      <option value="Day">Заблокувати на день</option>
+                      <option value="Week">Заблокувати на тиждень</option>
+                      <option value="Month">Заблокувати на місяць</option>
+                      <option value="Year">Заблокувати на рік</option>
+                      <option value="Forever">Заблокувати назавжди</option>
+                    </select>
+                  </td>
+                  <td>
                     <button onClick={handleSaveClick} style={{ background: 'green' }}>Зберегти</button>{' '}
                     <button onClick={handleCancelClick} style={{ background: 'red' }}>Відмінити</button>
                   </td>
@@ -244,6 +284,10 @@ function UserTable() {
                     ) : '-'}
                   </td>
                   <td>{user.accountVerified ? 'Так' : 'Ні'}</td>
+                  <td>
+                    {user.isLockedOut ? 'Заблокований' : 'Активний'}
+                  </td>
+
                   <td>
                     <button onClick={() => handleEditClick(user)}>Редагувати</button>
                     <br />

@@ -24,15 +24,23 @@ function LoginPage() {
 
             if (response.status === 200) {
                 const { userId, userName, email, roles } = response.data;
-                await checkAuthStatus(); 
+                await checkAuthStatus();
                 setIsLoggedIn(true);
                 setUser({ id: userId, userName, email, roles });
                 navigate('/');
             }
         } catch (error) {
             if (error.response) {
+                const message = error.response.data?.message;
+
                 if (error.response.status === 401) {
-                    setErrorMessage('Неправильний логін або пароль');
+                    if (message === "User account is locked out.") {
+                        setErrorMessage('Ваш акаунт заблоковано');
+                    } else if (message === "Invalid login attempt") {
+                        setErrorMessage('Неправильний логін або пароль');
+                    } else {
+                        setErrorMessage(`Помилка: ${message}`);
+                    }
                 } else {
                     setErrorMessage(`Помилка: ${error.response.status}`);
                 }
@@ -40,6 +48,7 @@ function LoginPage() {
                 setErrorMessage("Помилка підключення до сервера");
             }
         }
+
     };
 
     return (

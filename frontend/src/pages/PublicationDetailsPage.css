@@ -58,9 +58,12 @@
 }
 
 .details-page_image {
-    width: 100%;
+    width: 80%;             
+    height: 488px;             
+    object-fit: cover;        
     border-radius: 12px;
-    margin: 20px 0;
+    display: block;           
+    margin: 20px auto;
 }
 
 .details-page_object-info {
