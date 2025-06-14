@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import './PublicationsListPage.css';
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from '../helpers/AuthHelper';
 
 function PublicationsListPage() {
+    const { user, isLoggedIn, isLoading } = useAuth();
 
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -31,9 +33,10 @@ function PublicationsListPage() {
             } catch (err) {
                 setError("Помилка при завантаженні публікацій");
             }
+            console.log("accountVerified type:", typeof user?.accountVerified, "value:", user?.accountVerified);
         };
         fetchPublications();
-    }, []);
+    }, [isLoading, user]);
 
     useEffect(() => {
         const fetchCountries = async () => {
@@ -101,7 +104,8 @@ function PublicationsListPage() {
 
     const handleAdding = () => {
         navigate(`/posts/add`);
-    }
+    };
+    
     return (
         <>
             <div className='top-section'>
@@ -155,9 +159,12 @@ function PublicationsListPage() {
                         <button className='blogPost-container_buttons_filter' onClick={handleApplyFilters}>
                             Застосувати фільтри
                         </button>
-                        <button className='blogPost-container_buttons_add' onClick={handleAdding}>
-                            Створити новий пост
-                        </button>
+                        {isLoggedIn && user && (user?.accountVerified || user.roles?.includes("Admin") || user.roles?.includes("Moderator")) && (
+                            <button className='blogPost-container_buttons_add' onClick={handleAdding}>
+                                Створити публікацію
+                            </button>
+                        )}
+
                     </div>
                     {error && <p style={{ color: 'red' }}>{error}</p>}
 

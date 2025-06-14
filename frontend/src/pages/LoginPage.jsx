@@ -23,10 +23,7 @@ function LoginPage() {
             });
 
             if (response.status === 200) {
-                const { userId, userName, email, roles } = response.data;
                 await checkAuthStatus();
-                setIsLoggedIn(true);
-                setUser({ id: userId, userName, email, roles });
                 navigate('/');
             }
         } catch (error) {

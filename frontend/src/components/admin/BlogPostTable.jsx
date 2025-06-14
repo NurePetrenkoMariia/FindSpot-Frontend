@@ -14,7 +14,7 @@ function BlogPostTable() {
             setPosts(res.data);
             setLoading(false);
         } catch (e) {
-            setError('Помилка завантаження блогпостів');
+            setError('Помилка завантаження публікацій');
             setLoading(false);
         }
     };
@@ -24,7 +24,7 @@ function BlogPostTable() {
     }, []);
 
     const handleDeleteClick = async (id) => {
-        const confirmed = window.confirm('Ви впевнені, що хочете видалити цей блогпост?');
+        const confirmed = window.confirm('Ви впевнені, що хочете видалити цю публікацію?');
         if (!confirmed) return;
 
         try {

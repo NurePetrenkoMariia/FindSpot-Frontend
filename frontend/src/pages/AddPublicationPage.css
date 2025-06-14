@@ -104,3 +104,20 @@
     margin-bottom: 10px;
     font-size: 0.95rem;
 }
+
+.cancel-publication_card-button{
+    padding: 12px;
+    background-color: #d2321d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.edit-publication_card-buttons{
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}

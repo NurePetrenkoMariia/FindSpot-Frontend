@@ -263,3 +263,8 @@
     margin: 15px 10px;
     margin-right: 0px;
 }
+
+.review-buttons-container{
+    display: flex;
+    gap: 10px;
+}

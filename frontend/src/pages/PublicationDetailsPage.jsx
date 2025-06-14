@@ -16,6 +16,8 @@ function PublicationDetailsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newReview, setNewReview] = useState({ content: '', rating: 0, featuredImageUrl: null });
     const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [reviewBeingEdited, setReviewBeingEdited] = useState(null);
     const [checkedLists, setCheckedLists] = useState({
         wantToVisit: false,
         visited: false,
@@ -139,6 +141,16 @@ function PublicationDetailsPage() {
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
 
+    const openEditModal = (review) => {
+        setReviewBeingEdited({ ...review });
+        setIsEditModalOpen(true);
+    }
+
+    const closeEditModal = () => {
+        setReviewBeingEdited(null);
+        setIsEditModalOpen(false);
+    };
+
     if (!post) {
         return <div className="details-page__loading">Завантаження...</div>;
     }
@@ -185,6 +197,55 @@ function PublicationDetailsPage() {
             alert("Не вдалося видалити публікацію");
         }
     };
+
+    const handleDeleteReview = async (reviewId) => {
+        const confirmDelete = window.confirm("Ви дійсно хочете видалити цей коментар?");
+        if (!confirmDelete) return;
+        try {
+            await axios.delete(`/api/Reviews/${reviewId}`, {
+                withCredentials: true
+            });
+
+            setReviews(reviews.filter(review => review.id !== reviewId));
+
+            alert("Коментар видалено");
+
+        }
+        catch (error) {
+            alert("Не вдалося видалити коментар!")
+        }
+    }
+
+    const handleEditReviewSubmit = async () => {
+        try {
+            const updatedReview = {
+                id: reviewBeingEdited.id,
+                content: reviewBeingEdited.content,
+                rating: reviewBeingEdited.rating,
+                featuredImageUrl: reviewBeingEdited.featuredImageUrl,
+                userId: reviewBeingEdited.userId,
+                blogPostId: reviewBeingEdited.blogPostId,
+                dateAdded: reviewBeingEdited.dateAdded,
+                userName: reviewBeingEdited.userName,
+                blogPost: reviewBeingEdited.blogPost
+            };
+
+            await axios.put(`/api/Reviews/${reviewBeingEdited.id}`, updatedReview, {
+                withCredentials: true
+            });
+
+            setReviews(reviews.map(r =>
+                r.id === reviewBeingEdited.id ? { ...r, ...updatedReview } : r
+            ));
+
+            alert("Відгук оновлено успішно!");
+            closeEditModal();
+        }
+        catch (error) {
+            console.error("Помилка при редагуванні відгуку:", error);
+            alert("Не вдалося оновити відгук");
+        }
+    }
 
     return (
         <div className="details-page">
@@ -286,6 +347,7 @@ function PublicationDetailsPage() {
                 ) : (
                     reviews.map((review) => (
                         <div key={review.id} className="review-card">
+                            {console.log("Review:", review)}
                             <div className="review-card_header">
                                 <strong>{review.userName || "Анонім"}</strong>
                                 <span className="review-card_date">
@@ -306,6 +368,23 @@ function PublicationDetailsPage() {
                                     alt="Фото до коментаря"
                                     className="review-card_image"
                                 />
+                            )}
+                            {user && (review.userId === user.id) && (
+                                <div className="review-buttons-container">
+                                    <button className="btn-post-delete" onClick={() => handleDeleteReview(review.id)}>
+                                        Видалити
+                                    </button>
+                                    <button className="details-page_save-btn" onClick={() => openEditModal(review)}>
+                                        Редагувати
+                                    </button>
+                                </div>
+                            )}
+                            {user && (review.userId != user.id && (user.roles?.includes("Admin") || user.roles?.includes("Moderator"))) && (
+                                <div className="review-buttons-container">
+                                    <button className="btn-post-delete" onClick={() => handleDeleteReview(review.id)}>
+                                        Видалити
+                                    </button>
+                                </div>
                             )}
                         </div>
                     ))
@@ -354,6 +433,53 @@ function PublicationDetailsPage() {
                     </div>
                     <button onClick={closeModal}>Скасувати</button>
                     <button onClick={handleReviewSubmit} disabled={newReview.featuredImageUrl === null && selectedFile !== null}>Зберегти</button>
+                </ReactModal>
+                <ReactModal isOpen={isEditModalOpen}
+                    onRequestClose={closeEditModal}
+                    contentLabel="Редагувати коментар"
+                    className="modal"
+                    overlayClassName="modal-overlay"
+                >
+                    <h2>Змініть свій коментар</h2>
+                    {reviewBeingEdited && (
+                        <>
+                            <textarea
+                                placeholder="Ваш коментар..."
+                                value={reviewBeingEdited.content}
+                                onChange={(e) => setReviewBeingEdited({ ...reviewBeingEdited, content: e.target.value })}
+                            />
+                            {user?.accountVerified && (
+                                <div className="review-image-upload">
+                                    <label>Фото:</label>
+                                    <input
+                                        type="file"
+                                        id="review-photo-upload"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                    />
+                                </div>
+                            )}
+                            <div>
+                                <label>Оцінка: </label>
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <span
+                                        key={star}
+                                        onClick={() => setReviewBeingEdited({ ...reviewBeingEdited, rating: star })}
+                                        style={{
+                                            cursor: 'pointer',
+                                            color: star <= reviewBeingEdited.rating ? '#FFD700' : '#ccc',
+                                            fontSize: '24px',
+                                        }}
+                                    >
+                                        ★
+                                    </span>
+                                ))}
+                            </div>
+                            <button onClick={closeEditModal}>Скасувати</button>
+                            <button onClick={handleEditReviewSubmit} disabled={newReview.featuredImageUrl === null && selectedFile !== null}>Зберегти</button>
+                        </>
+                    )}
+
                 </ReactModal>
             </div>
 

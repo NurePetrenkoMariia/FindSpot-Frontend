@@ -1,10 +1,11 @@
 import './AddPublicationPage.css';
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 function EditPublicationPage() {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [title, setTitle] = useState("");
     const [imageUrl, setImageUrl] = useState("");
     const [description, setDescription] = useState("");
@@ -105,6 +106,10 @@ function EditPublicationPage() {
 
             if (response.status === 200) {
                 setSuccessMessage("Публікацію оновлено!");
+
+                setTimeout(() => {
+                    window.location.href = `/posts/${id}`;
+                }, 1000)
             }
         } catch {
             setError("Помилка при оновленні публікації.");
@@ -194,10 +199,18 @@ function EditPublicationPage() {
                             )}
                         </div>
                     </div>
-
-                    <button type="submit" className="add-publication_card-button">
-                        Оновити публікацію
-                    </button>
+                    <div className='edit-publication_card-buttons'>
+                        <button
+                            type="button"
+                            className="cancel-publication_card-button"
+                            onClick={() => navigate(`/posts/${id}`)}
+                        >
+                            Скасувати
+                        </button>
+                        <button type="submit" className="add-publication_card-button">
+                            Оновити публікацію
+                        </button>
+                    </div>
                 </form>
             </div>
 
