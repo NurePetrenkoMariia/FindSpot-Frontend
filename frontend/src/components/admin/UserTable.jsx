@@ -295,7 +295,9 @@ function UserTable() {
                   <td>
                     <button onClick={() => handleEditClick(user)}>Редагувати</button>
                     <br />
+                    {user?.roles?.includes('Admin') && (
                     <button onClick={() => handleDeleteClick(user.id)} style={{ marginTop: '5px', background: 'red' }}>Видалити</button>
+                    )}
                   </td>
                 </>
               )}

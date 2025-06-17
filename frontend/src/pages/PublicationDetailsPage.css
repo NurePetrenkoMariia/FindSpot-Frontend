@@ -268,3 +268,23 @@
     display: flex;
     gap: 10px;
 }
+
+@media (max-width: 918px) {
+  .details-page_card {
+    padding: 15px;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .details-page_reviews {
+    width: 100% !important;
+    padding: 10px;
+  }
+
+  .details-page_image {
+    width: 100%;
+    height: auto;
+  }
+}
+
+

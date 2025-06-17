@@ -219,15 +219,9 @@ function PublicationDetailsPage() {
     const handleEditReviewSubmit = async () => {
         try {
             const updatedReview = {
-                id: reviewBeingEdited.id,
                 content: reviewBeingEdited.content,
                 rating: reviewBeingEdited.rating,
                 featuredImageUrl: reviewBeingEdited.featuredImageUrl,
-                userId: reviewBeingEdited.userId,
-                blogPostId: reviewBeingEdited.blogPostId,
-                dateAdded: reviewBeingEdited.dateAdded,
-                userName: reviewBeingEdited.userName,
-                blogPost: reviewBeingEdited.blogPost
             };
 
             await axios.put(`/api/Reviews/${reviewBeingEdited.id}`, updatedReview, {
@@ -336,7 +330,6 @@ function PublicationDetailsPage() {
                 <div className="details-page_content">
                     <p>{post.content}</p>
                 </div>
-
             </div>
             <div className="details-page_reviews">
                 <h3 className="details-page_reviews-title">Коментарі</h3>
@@ -479,10 +472,8 @@ function PublicationDetailsPage() {
                             <button onClick={handleEditReviewSubmit} disabled={newReview.featuredImageUrl === null && selectedFile !== null}>Зберегти</button>
                         </>
                     )}
-
                 </ReactModal>
             </div>
-
         </div >
     );
 }

@@ -40,7 +40,7 @@ function BlogPostTable() {
 
     return (
         <div className="admin-table-container">
-            <h2>БлогПости</h2>
+            <h2>Публікації</h2>
             <table className="admin-table">
                 <thead>
                     <tr>

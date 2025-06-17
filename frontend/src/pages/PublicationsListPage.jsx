@@ -109,7 +109,7 @@ function PublicationsListPage() {
     return (
         <>
             <div className='top-section'>
-                <h2 className="top-section-page-name">Cписок публікацій</h2>
+                <h2 className="top-section-page-name">Список публікацій</h2>
                 <div className="top-section-search">
                     <input
                         type="text"
