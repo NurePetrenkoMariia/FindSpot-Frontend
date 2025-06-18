@@ -105,6 +105,9 @@ function AddPublicationPage() {
                 setTags("");
                 setSelectedObjectId(null);
                 setSearchText("");
+                setTimeout(() => {
+                    window.location.href = `/posts/`;
+                }, 1000)
             }
         } catch (error) {
             setError("Помилка при додаванні публікації");
