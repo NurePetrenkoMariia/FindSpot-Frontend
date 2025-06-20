@@ -199,7 +199,7 @@ function UserTable() {
 
         <div className="add-publication_card-field">
           <label>
-            Фото*:
+            Фото:
             <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, false)} />
           </label>
           {createFormData.avatarImageUrl && (
@@ -226,11 +226,11 @@ function UserTable() {
           </tr>
         </thead>
         <tbody>
-          {users.map(user => (
-            <tr key={user.id}>
-              {editingId === user.id ? (
+          {users.map(u => (
+            <tr key={u.id}>
+              {editingId === u.id ? (
                 <>
-                  <td>{user.id}</td>
+                  <td>{u.id}</td>
                   <td>
                     <input name="userName" value={editFormData.userName} onChange={handleEditChange} />
                   </td>
@@ -279,24 +279,24 @@ function UserTable() {
                 </>
               ) : (
                 <>
-                  <td>{user.id}</td>
-                  <td>{user.userName}</td>
-                  <td>{user.email}</td>
+                  <td>{u.id}</td>
+                  <td>{u.userName}</td>
+                  <td>{u.email}</td>
                   <td>
-                    {user.avatarImageUrl ? (
-                      <a href={user.avatarImageUrl} target="_blank" rel="noreferrer">Посилання</a>
+                    {u.avatarImageUrl ? (
+                      <a href={u.avatarImageUrl} target="_blank" rel="noreferrer">Посилання</a>
                     ) : '-'}
                   </td>
-                  <td>{user.accountVerified ? 'Так' : 'Ні'}</td>
+                  <td>{u.accountVerified ? 'Так' : 'Ні'}</td>
                   <td>
-                    {user.isLockedOut ? 'Заблокований' : 'Активний'}
+                    {u.isLockedOut ? 'Заблокований' : 'Активний'}
                   </td>
 
                   <td>
-                    <button onClick={() => handleEditClick(user)}>Редагувати</button>
+                    <button onClick={() => handleEditClick(u)}>Редагувати</button>
                     <br />
                     {user?.roles?.includes('Admin') && (
-                    <button onClick={() => handleDeleteClick(user.id)} style={{ marginTop: '5px', background: 'red' }}>Видалити</button>
+                    <button onClick={() => handleDeleteClick(u.id)} style={{ marginTop: '5px', background: 'red' }}>Видалити</button>
                     )}
                   </td>
                 </>

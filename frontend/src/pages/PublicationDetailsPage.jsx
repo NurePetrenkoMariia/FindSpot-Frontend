@@ -37,7 +37,7 @@ function PublicationDetailsPage() {
                 const data = {
                     userId: user.id.toString(),
                     blogPostId: post.id,
-                    status: 'WantToVisit'
+                    status: 'wantToVisit'
                 };
                 console.log("Відправка WantToVisit:", data);
                 requests.push(
@@ -50,7 +50,7 @@ function PublicationDetailsPage() {
                 requests.push(axios.post('/api/UserBlogPost/add', {
                     userId: user.id.toString(),
                     blogPostId: post.id,
-                    status: 'Visited'
+                    status: 'visited'
                 }));
             }
 
@@ -70,6 +70,11 @@ function PublicationDetailsPage() {
             return;
         }
 
+        if (newReview.content.length > 1500) {
+            alert("Коментар не може перевищувати 1500 символів.");
+            return;
+        }
+
         try {
             const formData = {
                 content: newReview.content,
@@ -79,8 +84,14 @@ function PublicationDetailsPage() {
 
             await sendReviewToServer(formData);
         } catch (error) {
-            console.error("Помилка при надсиланні відгуку:", error);
-            alert(error.response?.data || "Не вдалося залишити коментар");
+            if (error.response?.status === 403 &&
+                typeof error.response.data === 'string' &&
+                error.response.data.includes("leave a review")) {
+                alert("Ви можете залишити відгук лише про місця, які відвідали.");
+            } else {
+                console.error("Помилка при надсиланні відгуку:", error);
+                alert(error.response?.data || "Не вдалося залишити коментар");
+            }
         }
     }
 
